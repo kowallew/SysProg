@@ -1,0 +1,144 @@
+#include <stdio.h>
+#include <string.h>
+struct f1  {
+	char name[20][80];
+	int  ind1 [20];
+      		};
+
+struct f3 {
+	int n1 [0xffff], n2 [0xffff], n3 [0xffff];
+    };
+
+int prov(char *subn, char *svn, char *obn, struct f1 el, struct f1 otn, struct f3 sv)
+{
+	int i;
+	int k;
+	i=0;
+	while ((strcmp (el.name[i], subn)!=0) && (strcmp(el.name[i],"")!=0)){
+	 //находим номер в котором имя элемента равно субъекту
+        //printf("%d\n", i);
+	i++;
+        }
+	if (strcmp(el.name[i],"")==0){
+	printf("нет такого субъекта\n");
+	return -1;
+	}
+        int snum;
+	snum=el.ind1[i];
+	i=0;
+	while ( (strcmp(el.name[i],obn)!=0) && (strcmp(el.name[i],"")!=0)){
+	i++; // находим номер в котором  имя эл-та равно объекту
+	}
+	if (strcmp(el.name[i],"")==0){
+	printf("нет такого обьекта\n");
+	return -1;
+	}
+	int onum;
+	onum=el.ind1[i];
+	i=0;
+	while ( (strcmp(otn.name[i],svn)!=0) && (strcmp(otn.name[i],"")!=0)){
+	i++; //находим номер отношения с введенным названием
+	}
+	if (strcmp(otn.name[i],"")==0){
+	printf("нет такого отношения\n");
+	return -1;
+	}
+        printf("мы дошли до последнего цикла\n");
+	int svnum;
+	svnum=otn.ind1[i];
+	//printf("%s %s %s\n", &snum,&svnum,&onum);
+	i=0;
+	do {
+	      //printf("%s%s %s%s %s%s\n", &snum,&sv.n1[i],&svnum,&sv.n2[i],&onum,&sv.n3[i]);
+	      if ((sv.n1[i]==snum) && (sv.n2[i]==svnum) && (sv.n1[i]!=0)){
+	         if (sv.n3[i]==onum){
+	            printf ("Yes\n");
+	            return 1;
+	            break;
+	         }
+	         else {
+	         snum=sv.n3[i];
+	         i=0;
+	         continue;
+	         }
+              }
+	      //printf("%d\n",i);
+	      i++;
+	} while (sv.n1[i]!=0);
+	if (sv.n1[i]==0){
+	printf("в третьем файле не описано такое отношение для данного субьекта\n");
+	return -1;
+	}
+}
+
+
+
+struct f1 readFile(char *a)
+{
+    int i;
+    struct f1 temp;
+    FILE * pFile;
+    pFile = fopen (a,"r+");
+    if(pFile==NULL){
+        printf ("Invalid path to file \n");
+        return temp;
+    }
+    i=0;
+    while ((fscanf (pFile, "%s", &temp.ind1[i]))!=EOF){
+      //чтение начала
+      fscanf (pFile, "%s\n", &temp.name[i]);
+printf("%s %s \n",&temp.ind1[i], &temp.name[i]);
+	i++;
+      }
+
+    fclose (pFile);
+ return temp;
+}
+struct f3 readFile3(char *a1)
+{
+    int i;
+    struct f3 temp;
+    FILE * pFile;
+    pFile = fopen (a1,"r+");
+    if(pFile==NULL){
+        printf ("Invalid path to file \n");
+        return temp;
+    }
+    i=0;
+    while ((fscanf (pFile, "%s ", &temp.n1[i]))!=EOF){
+      //чтение начала
+      fscanf (pFile, "%s ", &temp.n2[i]);
+      fscanf (pFile, "%s\n", &temp.n3[i]);
+      printf("%s %s %s \n", &temp.n1[i], &temp.n2[i], &temp.n3[i]);
+        i++;
+      }
+
+    fclose (pFile);
+ return temp;
+}
+
+int main (int argc, char *argv[])
+{
+  int i;
+  struct f1 s1;
+  struct f1 s2;
+  struct f3 s3;
+  char subname[80];
+  char otname[80];
+  char obname[80];
+  int ma;
+  s1=readFile(argv[1]);
+  s2=readFile(argv[2]);
+  s3=readFile3(argv[3]);
+  char str[100];
+  while (1==1){
+  printf("Введите (без исправлений!!!) ИмяСубъекта ИмяСвойства ИмяОбъекта:\n");
+  gets (str);
+  sscanf(str,"%s%s%s",&subname, &otname, &obname);
+  //puts (subname);
+  //puts (otname);
+  //puts (obname);
+  prov(subname, otname, obname, s1, s2, s3);
+  }
+return 0;
+}
